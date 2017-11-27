@@ -1,0 +1,13 @@
+*.pyc
+*.png
+*.jpg
+*.npz
+*log*.txt
+*.mat
+images/ 
+.DS_Store 
+*.so
+*.o
+*.a 
+models/
+
