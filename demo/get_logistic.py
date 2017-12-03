@@ -116,7 +116,7 @@ for imgId in imgIds:
                     X_NEG.append(X_neg)
                 else :
                     X_POS[index] = matlab_eng.cat(1,X_POS[index],X_pos)
-                    X_NEG[index] = matlab_eng.cat(1,X_neg[index],X_neg)
+                    X_NEG[index] = matlab_eng.cat(1,X_NEG[index],X_neg)
 
                 if (save_features):
                     print ('#################################')

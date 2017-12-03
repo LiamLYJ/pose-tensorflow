@@ -20,11 +20,16 @@ from multiperson.detections import extract_detections
 class DataItem:
     pass
 
+def get_counter_from_log_mat():
+    tmp = sio.loadmat('counter.mat')
+    return tmp['counter']
+
+
 map_coco2mpii = [16,14,12,11,13,15,10,8,6,5,7,9,18,17]
 cfg = load_config("demo/get_training_data.yaml")
-every_num = 2
-save_interval = 2
-max_item = 2 * every_num * save_interval
+every_num = 10
+save_interval = 20
+max_item = 20 * every_num * save_interval
 
 dataset = create_dataset(cfg)
 
@@ -43,10 +48,17 @@ coco = COCO(ann_file)
 # imgIds = coco.getImgIds()
 sess, inputs, outputs = predict.setup_pose_prediction(cfg)
 
-num_joints = 3
-# num_joints = cfg.num_joints
+# num_joints = 3
+num_joints = cfg.num_joints
 
+try :
+    START = get_counter_from_log_mat()
+    print ('exist training before, start with Counter =%d'%START)
+except:
+    START = 0
+    print ('no training, before, start with Counter = 0')
 print ('starting matlab engine.............')
+
 import matlab
 import matlab.engine
 matlab_eng = matlab.engine.start_matlab()
@@ -60,6 +72,9 @@ data = []
 X_POS = []
 X_NEG = []
 for item_index, imgId in enumerate(my_imgIds.tolist()):
+    counter += 1
+    if counter <=  START:
+        continue
     item = DataItem()
 
     img = coco.loadImgs(imgId)[0]
@@ -101,7 +116,6 @@ for item_index, imgId in enumerate(my_imgIds.tolist()):
     else:
         continue
 
-    counter += 1
     data.append(item)
     if (counter % every_num == 0 ):
         gt_data = np.asarray(data)
@@ -116,13 +130,13 @@ for item_index, imgId in enumerate(my_imgIds.tolist()):
         for i in range(1,num_joints):
             for j in range(i+1,num_joints+1):
                 [X_pos,X_neg] = matlab_eng.get_feat(i,j,nargout=2)
-                # when its first time get features OR when we just clear the saving memory 
+                # when its first time get features OR when we just clear the saving memory
                 if ((counter == every_num) or ((counter -every_num) % (save_interval * every_num ) == 0) ):
                     X_POS.append(X_pos)
                     X_NEG.append(X_neg)
                 else :
                     X_POS[index] = matlab_eng.cat(1,X_POS[index],X_pos)
-                    X_NEG[index] = matlab_eng.cat(1,X_neg[index],X_neg)
+                    X_NEG[index] = matlab_eng.cat(1,X_NEG[index],X_neg)
 
                 if (save_features):
                     print ('#################################')
@@ -140,10 +154,11 @@ for item_index, imgId in enumerate(my_imgIds.tolist()):
                         save_X_pos = np.asarray(X_POS[index])
                         save_X_neg = np.asarray(X_NEG[index])
                         sio.savemat('%sfeat_spatial_%d_%d.mat'%(pairwiseDir,i,j),{'X_pos':save_X_pos,'X_neg':save_X_neg})
-                    print ('saved done')
                 index += 1
         # clear memory for saving X_POS and X_NEG
         if (save_features):
+            sio.savemat('counter.mat',{'counter':counter})
+            print ('saved featurs done, current counter = %d'%counter)
             X_POS = []
             X_NEG = []
     if counter >= max_item:

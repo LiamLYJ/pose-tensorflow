@@ -9,7 +9,8 @@ fprintf('cidx: %d - %d\n',[cidx1,cidx2]);
 % training flags
 bVis = false;
 gt_files = '/home/gpu_server/lyj/pose-tensorflow/data.mat';
-load('/home/gpu_server/lyj/pose-tensorflow/models/coco/pairwise_original/pairwise_stats.mat','graph');
+% load('/home/gpu_server/lyj/pose-tensorflow/models/coco/pairwise_original/pairwise_stats.mat','graph');
+load('/home/gpu_server/lyj/pose-tensorflow/models/coco/pairwise/pairwise_stats.mat','graph');
 nFeatSample = 10^2;
 dist_thresh = 17;
 stride = 8;
