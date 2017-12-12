@@ -82,7 +82,8 @@ def eval_graph(sm, detections):
 
                     firstidx = lastidx
 
-    is_sparse_graph = True
+    # is_sparse_graph = True
+    is_sparse_graph = False
     solver_type = False
     do_suppression = True
     logit_in_solver = False

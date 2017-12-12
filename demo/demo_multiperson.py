@@ -34,10 +34,9 @@ sess, inputs, outputs = predict.setup_pose_prediction(cfg)
 
 # Read image from file
 # file_name = "demo/image_multi.png"
-# file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000262145.jpg'
-# file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000393224.jpg'
 # file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524297.jpg'
-file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524320.jpg'
+file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524401.jpg'
+# file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524320.jpg'
 # file_name = "demo/3_2_0000348.png"
 # file_name = "demo/im0001.jpg"
 image = imread(file_name, mode='RGB')
@@ -76,7 +75,9 @@ unLab, pos_array, unary_array, pwidx_array, pw_array = eval_graph(
     sm, detections)
 person_conf_multi = get_person_conf_multicut(sm, unLab, unary_array, pos_array)
 # print ('person_conf_multi:', person_conf_multi.shape)
-
+# print ('********')
+# print (person_conf_multi)
+# raise
 img = np.copy(image)
 
 visim_multi = img.copy()

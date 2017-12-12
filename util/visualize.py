@@ -86,7 +86,8 @@ def show_arrows(cfg, img, pose, arrows):
     b.set_title('Predicted Pairwise Differences')
 
     color_opt=['r', 'g', 'b', 'c', 'm', 'y', 'k']
-    joint_pairs = [(6, 5), (6, 11), (6, 8), (6, 15), (6, 0)]
+    # joint_pairs = [(6, 5), (6, 11), (6, 8), (6, 15), (6, 0)]
+    joint_pairs = [(9, 13), (9, 3), (9, 8), (9, 11), (9, 5)]
     color_legends = []
     for id, joint_pair in enumerate(joint_pairs):
         end_joint_side = ("r " if joint_pair[1] % 2 == 0 else "l ") if joint_pair[1] != 0 else ""

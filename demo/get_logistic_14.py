@@ -29,7 +29,7 @@ map_coco2mpii = [16,14,12,11,13,15,10,8,6,5,7,9,18,17]
 cfg = load_config("demo/get_training_data.yaml")
 every_num = 10
 save_interval = 20
-max_item = 20 * every_num * save_interval
+max_item = 15 * every_num * save_interval
 
 dataset = create_dataset(cfg)
 

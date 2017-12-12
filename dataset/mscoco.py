@@ -33,14 +33,15 @@ def get_gt_visibilities(inFile, visibilities):
 
 class MSCOCO(PoseDataset):
     def __init__(self, cfg):
+        self.cfg = cfg
         if cfg.default_coco:
             cfg.all_joints = [[0], [2, 1], [4, 3], [6, 5], [8, 7],[10, 9], [12, 11], [14, 13], [16, 15]]
             cfg.all_joints_names = ["nose", 'eye', 'ear', 'shoulder', 'elbow', 'hand', 'hip', 'knee', 'foot']
             cfg.num_joints = 17
-        else:     
+        else:
             cfg.all_joints = [[0, 5], [1, 4], [2, 3], [6, 11], [7, 10], [8, 9], [12], [13]]
             cfg.all_joints_names = ['ankle', 'knee', 'hip', 'wrist', 'elbow', 'shoulder', 'chin', 'forehead']
-            cfg.num_joints = 14
+            cfg.num_joints = 14  
 
         super().__init__(cfg)
 
@@ -135,8 +136,10 @@ class MSCOCO(PoseDataset):
     #     return scmask
 
     def get_pose_segments(self):
-       return [[0, 1], [0, 2], [1, 3], [2, 4], [5, 7], [6, 8], [7, 9], [8, 10], [11, 13], [12, 14], [13, 15], [14, 16]]
-
+        if self.cfg.default_coco:
+            return [[0, 1], [0, 2], [1, 3], [2, 4], [5, 7], [6, 8], [7, 9], [8, 10], [11, 13], [12, 14], [13, 15], [14, 16]]
+        else:
+            return [[13, 12], [12, 8], [12, 9], [8, 7], [9, 10], [10, 11], [7, 6], [8,2],[9,3],[2,1],[3,4],[1,0],[4,5]]
     def visualize_coco(self, coco_img_results, visibilities):
         inFile = "tmp.json"
         with open(inFile, 'w') as outfile:
