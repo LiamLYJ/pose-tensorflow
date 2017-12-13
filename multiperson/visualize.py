@@ -123,8 +123,10 @@ class PersonDraw:
 
             assert (color_idx < len(self.track_colors))
 
-            # if np.sum(person_conf[pidx, :, 0] > 0) < draw_conf_min_count:
-            #     continue
+            if np.sum(person_conf[pidx, :, 0] > 0) < draw_conf_min_count:
+                continue
+
+            color_idx = 0
 
             for kidx1, kidx2 in dataset.get_pose_segments():
                 p1 = (int(math.floor(person_conf[pidx, kidx1, 0])), int(math.floor(person_conf[pidx, kidx1, 1])))

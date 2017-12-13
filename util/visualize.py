@@ -7,7 +7,6 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-
 def _npcircle(image, cx, cy, radius, color, transparency=0.0):
     """Draw a circle on an image using only numpy methods."""
     radius = int(radius)
@@ -74,7 +73,7 @@ def show_heatmaps(cfg, img, scmap, pose, cmap="jet"):
 
     plt.show()
 
-def show_arrows(cfg, img, pose, arrows):
+def show_arrows(cfg, img, pose, arrows, joint_pairs = []):
     fig = plt.figure()
     a = fig.add_subplot(2, 2, 1)
     plt.imshow(img)
@@ -87,19 +86,54 @@ def show_arrows(cfg, img, pose, arrows):
 
     color_opt=['r', 'g', 'b', 'c', 'm', 'y', 'k']
     # joint_pairs = [(6, 5), (6, 11), (6, 8), (6, 15), (6, 0)]
-    joint_pairs = [(9, 13), (9, 3), (9, 8), (9, 11), (9, 5)]
+    if not joint_pairs:
+        joint_pairs = [(0, 5), (0, 10), (0, 11), (0, 13), (0, 16)]
     color_legends = []
     for id, joint_pair in enumerate(joint_pairs):
         end_joint_side = ("r " if joint_pair[1] % 2 == 0 else "l ") if joint_pair[1] != 0 else ""
         end_joint_name = end_joint_side + cfg.all_joints_names[int(math.ceil(joint_pair[1] / 2))]
         start = arrows[joint_pair][0]
         end = arrows[joint_pair][1]
-        b.arrow(start[0], start[1], end[0]-start[0], end[1]-start[1], head_width=3, head_length=6, fc=color_opt[id], ec=color_opt[id], label=end_joint_name)
+        if end.ndim > 1:
+            count = end.shape[0]
+            for index in range(count):
+                b.arrow(start[index][0], start[index][1], end[index][0]-start[index][0], end[index][1]-start[index][1], \
+                head_width=3, head_length=6, fc=color_opt[id], ec=color_opt[id], label=end_joint_name)
+        else:
+            b.arrow(start[0], start[1], end[0]-start[0], end[1]-start[1], head_width=3, head_length=6, fc=color_opt[id], ec=color_opt[id], label=end_joint_name)
         color_legend = mpatches.Patch(color=color_opt[id], label=end_joint_name)
         color_legends.append(color_legend)
 
     plt.legend(handles=color_legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
+
+def save_arrows(cfg, img, pose, arrows, joint_pairs = []):
+    fig = plt.imshow(img)
+    plt.title('Predicted Different Part Corelation')
+    color_opt=['r', 'g', 'b', 'c', 'm', 'y', 'k']
+    # joint_pairs = [(6, 5), (6, 11), (6, 8), (6, 15), (6, 0)]
+    if not joint_pairs:
+        joint_pairs = [(0, 5), (0, 10), (0, 11), (0, 13), (0, 16)]
+    color_legends = []
+    for id, joint_pair in enumerate(joint_pairs):
+        end_joint_side = ("r " if joint_pair[1] % 2 == 0 else "l ") if joint_pair[1] != 0 else ""
+        end_joint_name = end_joint_side + cfg.all_joints_names[int(math.ceil(joint_pair[1] / 2))]
+        start = arrows[joint_pair][0]
+        end = arrows[joint_pair][1]
+        if end.ndim > 1:
+            count = end.shape[0]
+            for index in range(count):
+                plt.arrow(start[index][0], start[index][1], end[index][0]-start[index][0], end[index][1]-start[index][1], \
+                head_width=3, head_length=6, fc=color_opt[id], ec=color_opt[id], label=end_joint_name)
+        else:
+            plt.arrow(start[0], start[1], end[0]-start[0], end[1]-start[1], head_width=3, head_length=6, fc=color_opt[id], ec=color_opt[id], label=end_joint_name)
+        # color_legend = mpatches.Patch(color=color_opt[id], label=end_joint_name)
+        # color_legends.append(color_legend)
+
+    # plt.legend(handles=color_legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    fig.axes.get_xaxis().set_visible(False)
+    fig.axes.get_yaxis().set_visible(False)
+    plt.savefig('./my_results/result.png')
 
 def waitforbuttonpress():
     plt.waitforbuttonpress(timeout=1)

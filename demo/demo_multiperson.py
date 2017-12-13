@@ -35,9 +35,9 @@ sess, inputs, outputs = predict.setup_pose_prediction(cfg)
 # Read image from file
 # file_name = "demo/image_multi.png"
 # file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524297.jpg'
-file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524401.jpg'
+# file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524401.jpg'
 # file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524320.jpg'
-# file_name = "demo/3_2_0000348.png"
+file_name = "demo/3_2_0000078.png"
 # file_name = "demo/im0001.jpg"
 image = imread(file_name, mode='RGB')
 

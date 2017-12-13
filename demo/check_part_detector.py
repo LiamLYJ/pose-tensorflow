@@ -28,10 +28,12 @@ sess, inputs, outputs = predict.setup_pose_prediction(cfg)
 
 # Read image from file
 # file_name = "demo/image_multi.png"
-file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524297.jpg'
+# file_name = "demo/x1.jpg"
+# file_name = "demo/x2.jpg"
+# file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524297.jpg'
 # file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524401.jpg'
 # file_name = '/home/gpu_server/lyj/coco/train2014/COCO_train2014_000000524320.jpg'
-# file_name = "demo/3_2_0000348.png"
+file_name = "demo/3_2_0000078.png"
 # file_name = "demo/im0001.jpg"
 image = imread(file_name, mode='RGB')
 
@@ -42,41 +44,43 @@ outputs_np = sess.run(outputs, feed_dict={inputs: image_batch})
 scmap, locref, pairwise_diff = predict.extract_cnn_output(
     outputs_np, cfg, dataset.pairwise_stats)
 
-print ('shape of scmap: ', scmap.shape)
-print ('shape of pairwise: ', pairwise_diff.shape)
+# print ('shape of scmap: ', scmap.shape)
+# print ('shape of pairwise: ', pairwise_diff.shape)
+# print ('shape of locref: ', locref.shape)
+# def show_heatmaps(img, scmap, cmap="jet"):
+#     interp = "bilinear"
+#     all_joints = cfg.all_joints
+#     all_joints_names = cfg.all_joints_names
+#     subplot_width = 3
+#     subplot_height = math.ceil((len(all_joints) + 1) / subplot_width)
+#     f, axarr = plt.subplots(subplot_height, subplot_width)
+#     for pidx, part in enumerate(all_joints):
+#         plot_j = (pidx + 1) // subplot_width
+#         plot_i = (pidx + 1) % subplot_width
+#         scmap_part = np.sum(scmap[:, :, part], axis=2)
+#         scmap_part = imresize(scmap_part, 8.0, interp='bicubic')
+#         scmap_part = np.lib.pad(scmap_part, ((4, 0), (4, 0)), 'minimum')
+#         curr_plot = axarr[plot_j, plot_i]
+#         curr_plot.set_title(all_joints_names[pidx])
+#         curr_plot.axis('off')
+#         curr_plot.imshow(img, interpolation=interp)
+#         curr_plot.imshow(scmap_part, alpha=.5, cmap=cmap, interpolation=interp)
+#
+#     curr_plot = axarr[0,0]
+#     curr_plot.set_title('initial image')
+#     curr_plot.axis('off')
+#     curr_plot.imshow(img)
+#     plt.show()
+#
+# show_heatmaps(image,scmap)
+# plt.waitforbuttonpress(timeout=1)
+# raise
 
-def show_heatmaps(img, scmap, cmap="jet"):
-    interp = "bilinear"
-    all_joints = cfg.all_joints
-    all_joints_names = cfg.all_joints_names
-    subplot_width = 3
-    subplot_height = math.ceil((len(all_joints) + 1) / subplot_width)
-    f, axarr = plt.subplots(subplot_height, subplot_width)
-    for pidx, part in enumerate(all_joints):
-        plot_j = (pidx + 1) // subplot_width
-        plot_i = (pidx + 1) % subplot_width
-        scmap_part = np.sum(scmap[:, :, part], axis=2)
-        scmap_part = imresize(scmap_part, 8.0, interp='bicubic')
-        scmap_part = np.lib.pad(scmap_part, ((4, 0), (4, 0)), 'minimum')
-        curr_plot = axarr[plot_j, plot_i]
-        curr_plot.set_title(all_joints_names[pidx])
-        curr_plot.axis('off')
-        curr_plot.imshow(img, interpolation=interp)
-        curr_plot.imshow(scmap_part, alpha=.5, cmap=cmap, interpolation=interp)
-
-    curr_plot = axarr[0,0]
-    curr_plot.set_title('initial image')
-    curr_plot.axis('off')
-    curr_plot.imshow(img)    
-    plt.show()
-
-show_heatmaps(image,scmap)
-plt.waitforbuttonpress(timeout=1)
-
-# pose = predict.argmax_pose_predict(scmap, locref, cfg.stride)
-# arrows = predict.argmax_arrows_predict(scmap, locref, pairwise_diff, cfg.stride)
+pose = predict.argmax_pose_predict(scmap, locref, cfg.stride)
+arrows = predict.argmax_arrows_predict(scmap, locref, pairwise_diff, cfg.stride,topk = 25)
+visualize.save_arrows(cfg, image, pose, arrows)
 # visualize.show_arrows(cfg, image, pose, arrows)
-# visualize.waitforbuttonpress()
+visualize.waitforbuttonpress()
 
 # def show_pairwise_diff(img, scmap, pairwise_diff,id,cmap="jet"):
 #     interp = "bilinear"
@@ -110,7 +114,7 @@ plt.waitforbuttonpress(timeout=1)
 #                 delta_x = int(round(diff_map_x[j,i]))
 #                 delta_y = int(round(diff_map_y[j,i]))
 #                 target_maps[j*stride:(j+1)*stride + delta_y,i*stride:(i+1)*stride + delta_x, index] = value
-#                 # target_maps[j*stride:(j+1)*stride ,i*stride:(i+1)*stride , index] = value
+#
 #     for pidx, part in enumerate(all_joints):
 #         plot_j = (pidx + 1) // subplot_width
 #         plot_i = (pidx + 1) % subplot_width
@@ -121,6 +125,13 @@ plt.waitforbuttonpress(timeout=1)
 #         curr_plot.axis('off')
 #         curr_plot.imshow(img, interpolation=interp)
 #         curr_plot.imshow(target_map, alpha=.5, cmap=cmap, interpolation=interp)
+#
+#     curr_plot = axarr[0,0]
+#     curr_plot.set_title('scmap')
+#     curr_plot.axis('off')
+#     curr_plot.imshow(img, interpolation=interp)
+#     anchor_map_resized = imresize(anchor_map, 8.0, interp = 'bicubic')
+#     curr_plot.imshow(anchor_map_resized, alpha = 0.5, cmap = cmap, interpolation = interp)
 #     plt.show()
 #
 # show_pairwise_diff(image, scmap, pairwise_diff,12)

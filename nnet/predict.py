@@ -62,20 +62,34 @@ def argmax_pose_predict(scmap, offmat, stride):
     return np.array(pose)
 
 
-def argmax_arrows_predict(scmap, offmat, pairwise_diff, stride):
+def argmax_arrows_predict(scmap, offmat, pairwise_diff, stride,topk = None):
     num_joints = scmap.shape[2]
     arrows = {}
-    for joint_idx in range(num_joints):
-        maxloc = np.unravel_index(np.argmax(scmap[:, :, joint_idx]),
-                                  scmap[:, :, joint_idx].shape)
-        offset = np.array(offmat[maxloc][joint_idx])[::-1] if offmat is not None else 0
-        pos_f8 = (np.array(maxloc).astype('float') * stride + 0.5 * stride +
-                  offset)[::-1]
-        for joint_idx_end in range(num_joints):
-            if joint_idx_end != joint_idx:
-                pair_id = (num_joints - 1) * joint_idx + joint_idx_end - int(joint_idx < joint_idx_end)
-                difference = np.array(pairwise_diff[maxloc][pair_id])[::-1] if pairwise_diff is not None else 0
-                pos_f8_end = (np.array(maxloc).astype('float') * stride + 0.5 * stride + difference)[::-1]
-                arrows[(joint_idx, joint_idx_end)] = (pos_f8, pos_f8_end)
-
+    if topk is None:
+        for joint_idx in range(num_joints):
+            maxloc = np.unravel_index(np.argmax(scmap[:, :, joint_idx]),
+                                      scmap[:, :, joint_idx].shape)
+            offset = np.array(offmat[maxloc][joint_idx])[::-1] if offmat is not None else 0
+            pos_f8 = (np.array(maxloc).astype('float') * stride + 0.5 * stride +
+                      offset)[::-1]
+            for joint_idx_end in range(num_joints):
+                if joint_idx_end != joint_idx:
+                    pair_id = (num_joints - 1) * joint_idx + joint_idx_end - int(joint_idx < joint_idx_end)
+                    difference = np.array(pairwise_diff[maxloc][pair_id])[::-1] if pairwise_diff is not None else 0
+                    pos_f8_end = (np.array(maxloc).astype('float') * stride + 0.5 * stride + difference)[::-1]
+                    arrows[(joint_idx, joint_idx_end)] = (pos_f8, pos_f8_end)
+    else:
+        for joint_idx in range(num_joints):
+            curr_scmap = scmap[:,:,joint_idx]
+            k = range(len(curr_scmap.reshape(-1))- topk, len(curr_scmap.reshape(-1)) )
+            topk_flatted = np.argpartition(curr_scmap,k, axis = None)[k]
+            topk_loc = np.array(np.unravel_index(topk_flatted, curr_scmap.shape))
+            offset = np.array(offmat[topk_loc[0,:], topk_loc[1,:],joint_idx])[:,::-1] if offmat is not None else 0
+            pos_f8s = (np.transpose(topk_loc).astype('float')*stride + 0.5*stride + offset)[:,::-1]
+            for joint_idx_end in range(num_joints):
+                if joint_idx_end != joint_idx:
+                    pair_id = (num_joints -1 ) * joint_idx + joint_idx_end - int(joint_idx < joint_idx_end)
+                    diffs = np.array(pairwise_diff[topk_loc[0,:],topk_loc[1,:], pair_id])[:,::-1] if pairwise_diff is not None else 0
+                    pos_f8s_end = (np.transpose(topk_loc).astype('float') * stride + 0.5 *stride + diffs)[:,::-1]
+                    arrows[(joint_idx, joint_idx_end)] = (pos_f8s, pos_f8s_end)
     return arrows

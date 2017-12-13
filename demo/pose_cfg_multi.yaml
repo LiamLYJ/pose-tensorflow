@@ -1,12 +1,12 @@
 dataset_type: coco
 
-default_coco: False
+# default_coco: False
 
 global_scale: 1.0
 # coco -17
-# init_weights: models/coco/coco-resnet-101
+init_weights: models/coco/coco-resnet-101
 # coco - 14
-init_weights: /home/gpu_server/lyj/pose-tensorflow/models/coco/train/snapshot-1800000
+# init_weights: /home/gpu_server/lyj/pose-tensorflow/models/coco/train/snapshot-1800000
 
 location_refinement: true
 locref_stdev: 7.2801
@@ -35,14 +35,14 @@ scmap_threshold: 0.0
 
 pairwise_predict: true
 
-pairwise_stats_fn: models/coco/pairwise/pairwise_stats.mat
-pairwise_model_dir: models/coco/pairwise/
+# pairwise_stats_fn: models/coco/pairwise/pairwise_stats.mat
+# pairwise_model_dir: models/coco/pairwise/
 
 # pairwise_stats_fn: models/coco/pairwise_mixed/pairwise_stats.mat
 # pairwise_model_dir: models/coco/pairwise_mixed/
 
-# pairwise_stats_fn: models/coco/pairwise_original/pairwise_stats.mat
-# pairwise_model_dir: models/coco/pairwise_original/
+pairwise_stats_fn: models/coco/pairwise_original/pairwise_stats.mat
+pairwise_model_dir: models/coco/pairwise_original/
 
 max_input_size: 850
 pos_dist_thresh: 17
